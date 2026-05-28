@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Calculadora Pollos | Compra y Venta</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f0f7e8;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 700px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 24px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #2b5e2b;
+            text-align: center;
+        }
+        .seccion {
+            background: #fefef5;
+            padding: 15px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            border: 1px solid #d0e2c0;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 12px;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 4px;
+            border-radius: 10px;
+            border: 1px solid #aaa;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #2b5e2b;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background: #1e421e;
+        }
+        .resultado {
+            background: #e6f2e6;
+            padding: 15px;
+            border-radius: 16px;
+            margin-top: 25px;
+            border-left: 6px solid #2b5e2b;
+        }
+        .ganancia {
+            color: #1f6d1f;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        hr {
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🐔 Calculadora de Engorde</h1>
+
+    <div class="seccion">
+        <h2>💰 COMPRA (COSTOS)</h2>
+        <label>Valor unidad de pollo ($):</label>
+        <input type="number" id="precio_pollo_unidad" value="7500">
+
+        <label>Cantidad de pollos comprados:</label>
+        <input type="number" id="cantidad_pollos_comprados" value="120">
+
+        <label>Cantidad de bultos de comida:</label>
+        <input type="number" id="cantidad_bultos" value="11">
+
+        <label>Valor por bulto ($):</label>
+        <input type="number" id="valor_bulto" value="80000">
+    </div>
+
+    <div class="seccion">
+        <h2>📈 VENTA (INGRESOS)</h2>
+        <label>Cantidad de pollos a vender:</label>
+        <input type="number" id="cantidad_pollos_vender" value="120">
+
+        <label>Peso de cada pollo (libras):</label>
+        <input type="number" id="peso_cada_pollo" value="6">
+
+        <label>Valor de compra por libra ($):</label>
+        <input type="number" id="precio_venta_libra" value="5500">
+    </div>
+
+    <button onclick="calcular()">📊 Calcular todo</button>
+
+    <div id="resultados" class="resultado" style="display:none;">
+        <h3>📋 RESULTADOS FINANCIEROS</h3>
+        <p><strong>🐤 Costo total de pollos:</strong> $<span id="costo_total_pollos"></span></p>
+        <p><strong>🌽 Costo total de comida:</strong> $<span id="costo_total_comida"></span></p>
+        <p><strong>💸 Inversión total:</strong> $<span id="inversion_total"></span></p>
+        <hr>
+        <p><strong>🏷️ Ingreso por venta:</strong> $<span id="ingreso_total"></span></p>
+        <p class="ganancia"><strong>✅ Ganancia neta:</strong> $<span id="ganancia_neta"></span></p>
+        <p><strong>🐔 Inversión por pollo (comprado):</strong> $<span id="inversion_por_pollo"></span></p>
+    </div>
+</div>
+
+<script>
+    async function calcular() {
+        const datos = {
+            precio_pollo_unidad: document.getElementById('precio_pollo_unidad').value,
+            cantidad_pollos_comprados: document.getElementById('cantidad_pollos_comprados').value,
+            cantidad_bultos: document.getElementById('cantidad_bultos').value,
+            valor_bulto: document.getElementById('valor_bulto').value,
+            cantidad_pollos_vender: document.getElementById('cantidad_pollos_vender').value,
+            peso_cada_pollo: document.getElementById('peso_cada_pollo').value,
+            precio_venta_libra: document.getElementById('precio_venta_libra').value
+        };
+
+        try {
+            const response = await fetch('/calcular', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(datos)
+            });
+            const data = await response.json();
+
+            if (data.error) {
+                alert('Error: ' + data.error);
+                return;
+            }
+
+            document.getElementById('costo_total_pollos').innerText = data.costo_total_pollos.toLocaleString();
+            document.getElementById('costo_total_comida').innerText = data.costo_total_comida.toLocaleString();
+            document.getElementById('inversion_total').innerText = data.inversion_total.toLocaleString();
+            document.getElementById('ingreso_total').innerText = data.ingreso_total.toLocaleString();
+            document.getElementById('ganancia_neta').innerText = data.ganancia_neta.toLocaleString();
+            document.getElementById('inversion_por_pollo').innerText = data.inversion_por_pollo.toLocaleString();
+
+            document.getElementById('resultados').style.display = 'block';
+        } catch (err) {
+            alert('Error al conectar con el servidor');
+        }
+    }
+</script>
+</body>
+</html>
