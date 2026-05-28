@@ -2,7 +2,8 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Calculadora Pollos | Compra y Venta</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Pollos de Engorde</title>
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
@@ -40,6 +41,7 @@
             margin-top: 4px;
             border-radius: 10px;
             border: 1px solid #aaa;
+            box-sizing: border-box;
         }
         button {
             width: 100%;
@@ -119,41 +121,41 @@
 </div>
 
 <script>
-    async function calcular() {
-        const datos = {
-            precio_pollo_unidad: document.getElementById('precio_pollo_unidad').value,
-            cantidad_pollos_comprados: document.getElementById('cantidad_pollos_comprados').value,
-            cantidad_bultos: document.getElementById('cantidad_bultos').value,
-            valor_bulto: document.getElementById('valor_bulto').value,
-            cantidad_pollos_vender: document.getElementById('cantidad_pollos_vender').value,
-            peso_cada_pollo: document.getElementById('peso_cada_pollo').value,
-            precio_venta_libra: document.getElementById('precio_venta_libra').value
-        };
+    function calcular() {
+        // Leer valores
+        const precioPolloUnidad = parseFloat(document.getElementById('precio_pollo_unidad').value);
+        const cantidadPollosComprados = parseFloat(document.getElementById('cantidad_pollos_comprados').value);
+        const cantidadBultos = parseFloat(document.getElementById('cantidad_bultos').value);
+        const valorBulto = parseFloat(document.getElementById('valor_bulto').value);
+        const cantidadPollosVender = parseFloat(document.getElementById('cantidad_pollos_vender').value);
+        const pesoCadaPollo = parseFloat(document.getElementById('peso_cada_pollo').value);
+        const precioVentaLibra = parseFloat(document.getElementById('precio_venta_libra').value);
 
-        try {
-            const response = await fetch('/calcular', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(datos)
-            });
-            const data = await response.json();
-
-            if (data.error) {
-                alert('Error: ' + data.error);
-                return;
-            }
-
-            document.getElementById('costo_total_pollos').innerText = data.costo_total_pollos.toLocaleString();
-            document.getElementById('costo_total_comida').innerText = data.costo_total_comida.toLocaleString();
-            document.getElementById('inversion_total').innerText = data.inversion_total.toLocaleString();
-            document.getElementById('ingreso_total').innerText = data.ingreso_total.toLocaleString();
-            document.getElementById('ganancia_neta').innerText = data.ganancia_neta.toLocaleString();
-            document.getElementById('inversion_por_pollo').innerText = data.inversion_por_pollo.toLocaleString();
-
-            document.getElementById('resultados').style.display = 'block';
-        } catch (err) {
-            alert('Error al conectar con el servidor');
+        // Validaciones
+        if (isNaN(precioPolloUnidad) || isNaN(cantidadPollosComprados) || isNaN(cantidadBultos) || 
+            isNaN(valorBulto) || isNaN(cantidadPollosVender) || isNaN(pesoCadaPollo) || isNaN(precioVentaLibra)) {
+            alert('Por favor, complete todos los campos con números válidos');
+            return;
         }
+
+        // Cálculos
+        const costoTotalPollos = precioPolloUnidad * cantidadPollosComprados;
+        const costoTotalComida = cantidadBultos * valorBulto;
+        const inversionTotal = costoTotalPollos + costoTotalComida;
+        const ingresoTotal = cantidadPollosVender * pesoCadaPollo * precioVentaLibra;
+        const gananciaNeta = ingresoTotal - inversionTotal;
+        const inversionPorPollo = inversionTotal / cantidadPollosComprados;
+
+        // Mostrar resultados
+        document.getElementById('costo_total_pollos').innerText = costoTotalPollos.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        document.getElementById('costo_total_comida').innerText = costoTotalComida.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        document.getElementById('inversion_total').innerText = inversionTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        document.getElementById('ingreso_total').innerText = ingresoTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        document.getElementById('ganancia_neta').innerText = gananciaNeta.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        document.getElementById('inversion_por_pollo').innerText = inversionPorPollo.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+        // Mostrar el bloque de resultados
+        document.getElementById('resultados').style.display = 'block';
     }
 </script>
 </body>
